@@ -1,4 +1,7 @@
 # urpojentaisto
+
+VIRUSTORJUNTA SAATTAA HERJATA PELIÄ KÄYNNISTÄESSÄ. Tällöin aaeta Urpojen Taisto.exe sallittujen sovellusten listalle, jos haluat pelata.
+
 ---URPOJEN TAISTO 1.0.0---
 (c) Tuukka Jurvakainen / TuxuGames 2010 
 
