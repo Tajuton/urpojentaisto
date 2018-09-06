@@ -1,5 +1,6 @@
-# urpojentaisto
+# Urpojen taisto
 
+Peli vuodelta 2010. Toteutettu CoolBasicilla.
 VIRUSTORJUNTA SAATTAA HERJATA PELIÄ KÄYNNISTÄESSÄ. Tällöin aseta Urpojen Taisto.exe sallittujen sovellusten listalle, jos haluat pelata.
 
 ---URPOJEN TAISTO 1.0.0---
