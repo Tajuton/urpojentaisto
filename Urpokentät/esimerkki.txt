@@ -1,0 +1,12 @@
+tykki1 x-sijainti
+tykki1 y-sijainti
+tykki2 x-sijainti
+tykki2 y-sijainti
+ilmalaiva1 x-sijainti
+ilmalaiva1 y-sijainti
+ilmalaiva2 x-sijainti
+ilmalaiva2 y-sijainti
+ukko1 x-sijainti
+ukko1 y-sijainti
+ukko2 x-sijainti
+ukko2 y-sijainti

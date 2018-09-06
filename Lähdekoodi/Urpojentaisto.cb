@@ -1,0 +1,1912 @@
+//Urpojen taisto
+//(c)TuxuGames 2008-2010
+//Aloitettu 13.10.2008
+//Saatu päätökseen 09.04.2010
+
+//TYYPIT///
+Type BOXIT'luo kokoelma, jonka nimi on BOXIT
+    Field sisältö 'yksi kenttä nimeltään sisältö
+End Type 
+
+//TAULUKOT//
+Dim OHJUS_ELOSSA(2)'ohjuksille lähes kaikki
+Dim OHJUS(2,2)
+Dim OHJUS_XY(2,2)
+Dim OHJUS_ELOSSA2(2)
+Dim OHJUS2(2,2)
+Dim OHJUS_XY2(2,2)
+
+FrameLimit 40
+
+valikko:
+SCREEN 800,600//Kuvan leveys
+SetWindow "Urpojen taisto"
+SAFEEXIT OFF'Turvapoistuminen pois
+
+
+Cls 
+ClsColor cbblue
+  
+//FONTIT//
+otsikko=LoadFont("Verdana",120,ON)
+otsikko2=LoadFont("Verdana",90,ON)
+arial=LoadFont("Verdana",55,ON)
+perus=LoadFont("arial",15)
+kenttäfontti=LoadFont("arial",20)
+kenttäfontti2=LoadFont("arial",30)
+verdanapieni=LoadFont("verdana",20,ON)
+verdana=LoadFont("verdana",25,ON)
+verdanako=LoadFont("verdana",35,ON)
+
+
+
+//VALIKKO KUVAT//-kaikkiin valikkoihin
+otsikko=LoadImage("otsikko.png")
+pete=LoadImage("ukko5.png")
+aloita=LoadImage("aloita.png")
+lopeta=LoadImage("lopeta.png")
+valmis=LoadImage("valmis.png")
+normaali=LoadImage("normaali.png")
+urpomodi=LoadImage("urpo.png")
+//Lisää kursori:
+hiiri= LoadImage("pommi.png")
+hiirenpallo=MakeImage(1,1)
+DrawToImage hiirenpallo
+Color cbdark
+Dot 0,0
+DrawToScreen
+
+//Valikkoon tarvittavat muuttujat
+oikea=0//nollataan
+vasen=0//muut-
+haluuhyppy=0//tujat
+aly=-1
+
+//MUSAT//
+menumusa= PlaySound ("menumusa.ogg")
+
+//////PÄÄVALIKKO/////////
+Repeat
+
+    ShowMouse hiiri//hiiren kuvake
+    DrawImage hiirenpallo,MouseX(),MouseY()//hiiren kosketuspiste
+
+     If ImagesOverlap(hiirenpallo,MouseX(),MouseY(),aloita,150,220) Then 
+        If MouseUp(1) Then Goto Vakiopaine' Valitaan aloita
+    EndIf
+      If ImagesOverlap(hiirenpallo,MouseX(),MouseY(),lopeta,150,320) Then 
+        If MouseUp(1) Then Goto lopputekstit'Valitaan lopeta
+    EndIf
+    
+    If pälli=0 Then
+    If SoundPlaying(menumusa)=0 Then //Jos musa loppuu niin uutta kehiin
+        menumusa = PlaySound ("menumusa.ogg")
+    EndIf
+    EndIf
+    
+    If KeyDown (50) Then StopSound menumusa: pälli=1'Musat pois
+    
+    SetFont perus
+    Color cbyellow
+    Text 670,585,"http://koti.mbnet.fi/tuxu"
+    
+    //Kuvat piirretäään lopussa://
+    DrawImage otsikko,60,10'Otsikko
+    DrawImage pete,500,200'Valikko kuva
+    DrawImage aloita,150,220'aloita painike
+    DrawImage lopeta,150,320'lopeta painike
+    
+ 
+    DrawScreen
+Forever
+
+Vakiopaine:
+Cls
+ClearKeys
+ClearMouse
+/////////Pelimodin valinta:///////////
+Repeat
+
+    ShowMouse hiiri//hiiren kuvake
+    DrawImage hiirenpallo,MouseX(),MouseY()//hiiren kosketuspiste
+
+     If ImagesOverlap(hiirenpallo,MouseX(),MouseY(),normaali,150,220) Then 
+        If MouseUp(1) Then Goto Väli' Valitaan aloita
+    EndIf
+      If ImagesOverlap(hiirenpallo,MouseX(),MouseY(),urpomodi,150,320) Then 
+        If MouseUp(1) Then Goto Väli2'Valitaan lopeta
+    EndIf
+    
+    If pälli=0 Then
+    If SoundPlaying(menumusa)=0 Then //Jos musa loppuu niin uutta kehiin
+        menumusa = PlaySound ("menumusa.ogg")
+    EndIf
+    EndIf
+    
+    If KeyDown (50) Then StopSound menumusa: pälli=1'Musat pois
+    
+    SetFont perus
+    Color cbyellow
+    Text 670,585,"http://koti.mbnet.fi/tuxu"
+    
+    //Kuvat piirretäään lopussa://
+    DrawImage otsikko,60,10'Otsikko
+    DrawImage pete,500,200'Valikko kuva
+    DrawImage normaali,150,220'aloita painike
+    DrawImage urpomodi,150,320'lopeta painike
+    
+     //Lopetus://
+    If EscapeKey() Then StopSound menumusa: Goto valikko
+    
+ 
+    DrawScreen
+Forever
+
+
+//////////////VÄLIVALIKOT///////////
+Väli:
+Wait 200
+
+//Kuvia välivalikkoon:
+pudotusboxi=MakeImage (140,20)//Luodaan pudotettava valikko
+DrawToImage pudotusboxi
+Color cbdark
+Box 0,0,140,20,0
+Color cbwhite
+Box 1,1,138,18,1
+DrawToScreen
+
+pelaajavskone=MakeImage (250,27)
+DrawToImage pelaajavskone
+Color cbdark
+Box 0,0,250,27,0
+Color cbwhite
+Box 1,1,248,25,1
+Color cborange
+SetFont verdana
+Text 3,0,"Pelaaja vs. Tietokone"
+DrawToScreen
+
+pelaajavspelaaja=MakeImage (250,27)
+DrawToImage pelaajavspelaaja
+Color cbdark
+Box 0,0,250,27,0
+Color cbwhite
+Box 1,1,248,25,1
+Color cborange
+SetFont verdana
+Text 3,0,"Pelaaja vs. Pelaaja"
+DrawToScreen
+
+klickoikee=MakeImage (30,50)
+DrawToImage klickoikee
+Color cbyellow
+SetFont verdana
+Text 0,0,">"
+DrawToScreen
+
+klickvasen=MakeImage (30,50)
+DrawToImage klickvasen
+Color cbyellow
+SetFont verdana
+Text 0,0,"<"
+DrawToScreen
+////////////////
+
+//Muuttujat valikkoon:
+pudotusy=70
+pudotusx=100
+kenttävalinta=0
+amis=0
+//...Ja vähän peliinkin:
+elama=1
+elama2=1
+
+////////KENTTIEN ETSINTÄ///////////////
+ChDir "Kentät"'etitään kentät kansiosta kentät
+
+StartSearch//Kenttien etsintä
+
+    Repeat
+    
+        file$=FindFile()
+        If file$="" Then Exit ' kun ei ole kansioita, paetaan silmukasta
+        
+        If Lower(Right(file$,4))=".png" Then 'vain png kuvat hyväksytään
+            kenttä.BOXIT = New(BOXIT) 'luo uusi pudotuskuva
+            kenttä\sisältö= CloneImage(pudotusboxi) 'tee klooni kuvasta
+            DrawToImage kenttä\sisältö//Kirjoitetanaan
+                Color cbdark//        pudotusvalikkoon   
+                SetFont kenttäfontti
+                Text 5,0, file$//     kentän nimi
+            DrawToScreen
+
+        EndIf
+        
+        DrawScreen
+    Forever
+
+EndSearch'Loppu etsintä
+
+
+//////////TSE VALIKKO/////////////////
+Repeat
+
+    
+    If pälli=0 Then
+    If SoundPlaying(menumusa)=0 Then //Jos musa loppuu niin uutta kehiin
+        menumusa = PlaySound ("menumusa.ogg")
+    EndIf
+    EndIf
+    
+    If KeyDown (50) Then StopSound menumusa: pälli=1'Musat pois
+
+    ShowMouse hiiri//hiiren kuvake
+    DrawImage hiirenpallo,MouseX(),MouseY()//hiiren kosketuspiste
+       
+    For kenttä.BOXIT = Each BOXIT//Etitään kentät ja piirretään ne valittaviksi
+        pudotusy+19'Piirretään jokainen eri koordinaatteihin...
+        kenttävalinta+1'...alekkain
+        If pudotusy>500 Then pudotusy=89:pudotusx+145'Ja viereisen rivin vaihto
+        DrawImage kenttä\sisältö,pudotusx,pudotusy'Itse kuvan piirto
+        If ImagesCollide(hiirenpallo,MouseX(),MouseY(),0,kenttä\sisältö,pudotusx,pudotusy,0) Then
+            Color cborange'^^Jos hiiri on päällä niin...
+            Box pudotusx,pudotusy,140,19,0'...piirretään oranssi boxi
+            If MouseUp(1) Then amis=kenttävalinta'Kentän valinta
+        EndIf
+    Next kenttä
+    pudotusy=70'Nollataan piirto koordinaatit
+    pudotusx=100'^^
+    kenttävalinta=0'Ja kentän valinta tsydeemi
+    
+    //TEKSTIT://
+    Color 255,194,14
+    SetFont verdana
+    Text 100,50,"KENTTÄ:"    
+    Text 450,50,"PELAAJAT:"
+    Text 450,180,"ELÄMÄT:"
+    SetFont verdanako
+    Text 450,240,"VALINNAT:"
+    Color cbyellow
+    SetFont verdanapieni
+    Text 460,290,"Valitut pelaajat:"
+    Text 460,360,"Valittu kenttä:"
+    Text 460,420,"Elämät: "+elama2
+    Text 580,183,""+elama
+    
+    //Piirretään kuvia:
+    DrawImage pelaajavspelaaja,450,89
+    DrawImage pelaajavskone,450,119
+    DrawImage valmis,550,500
+    DrawImage klickoikee,610,180
+    DrawImage klickvasen,558,180
+    
+    //Pelaajien valinta peliin:    
+    If ImagesCollide(hiirenpallo,MouseX(),MouseY(),0,pelaajavspelaaja,450,89,0) Then
+        Color cborange
+        Box 450,89,250,27,0
+        If MouseUp(1) Then aly=0
+    EndIf
+    If ImagesCollide(hiirenpallo,MouseX(),MouseY(),0,pelaajavskone,450,119,0) Then
+        Color cborange
+        Box 450,119,250,27,0
+        If MouseUp(1) Then aly=1
+    EndIf
+    
+    //Piirretään valinnat jos pelaaja on valinnut jotain:
+    If aly=0 Then DrawImage pelaajavspelaaja,460,315'pelaajien
+    If aly=1 Then DrawImage pelaajavskone,460,315'valintaa
+    
+    If amis>0 Then//Kenttä valintaa:
+        wanhaaa=amis
+        For kenttä.BOXIT = Each BOXIT
+            DrawImage kenttä\sisältö,460,385
+            amis-1
+            If amis=0 Then Exit
+        Next kenttä
+        amis=wanhaaa
+    EndIf  
+    
+    
+     If ImagesOverlap(hiirenpallo,MouseX(),MouseY(),klickoikee,610,180) Then 
+        If MouseUp(1) Then 
+           elama+1: elama2+1'Käyttäjä valitsee alämät
+           If elama=100 And elama2=100 Then elama=99:elama2=99'Ei yli 100 elämää
+        EndIf
+    EndIf
+      If ImagesOverlap(hiirenpallo,MouseX(),MouseY(),klickvasen,558,180) Then 
+        If MouseUp(1) Then 
+           elama-1: elama2-1
+           If elama=0 And elama2=0 Then elama=1:elama2=1'Ei yli 100 elämää
+        EndIf
+    EndIf
+    
+    If ImagesOverlap(hiirenpallo,MouseX(),MouseY(),valmis,550,500) Then 
+        If MouseUp(1) Then 
+            If amis>0 And aly>-1 Then Goto peli'jos painetaan valmis, niin sitten peliin
+        EndIf
+    EndIf
+    
+    
+    DrawScreen
+Forever
+
+
+/////////////////////////////////////PELI/////////////////////////////////
+Peli:
+
+For kenttä.BOXIT = Each BOXIT//Poistetaan tyypit muistista:
+    DeleteImage kenttä\sisältö
+    Delete kenttä
+Next kenttä
+
+
+StopSound menumusa//Musa loppu
+ShowMouse OFF//hiiri pois näkyvistä
+
+//MUUTTUJAT\\
+'Ykkösukolle:
+x1#=750.0
+y1#=0.0
+hyppy1#=0
+elkka=100
+ase=1'ase: 1.pommi -1. miina
+'ykkösen pommi/miina
+suunta=0
+pommitus=0
+plento#=0.0
+mlento#=0//miina
+pommitusm1=0//miina
+suuntam1=0//miinan suunta
+miinamaassa=0//milloin miina maassa(käytetään räjäytykseen)
+'kakkosukolle:
+x2#=50.0
+y2#=0.0
+hyppy2#=0
+elkka2=100
+ase2=1'ase2: 1.pommi -1. miina
+'kakkosen pommi:
+suunta2=0
+pommitus2=0
+plento2#=0.0
+mlento2#=0//miina
+pommitusm2=0//miina
+suuntam2=0//miinan suunta
+miinamaassa2=0//milloin miina maassa(käytetään räjäytykseen)
+//Pommien/miinojen koordinaatit:
+px#=1000
+py#=1000
+px2#=1000
+py2#=1000
+mx#=1000//mii-
+my#=1000//nat
+mx2#=1000//mii-
+my2#=1000//nat
+//Räjähdykset:
+rx#=1000
+ry#=1000
+rx2#=1000
+ry2#=1000
+'Muut randomit:
+maax=0//Missä maa on-
+maay=0//melko turha
+pälli=0
+kävelynlataus=-2
+pelaaja2$="PELAAJA 2"
+If aly=1 Then pelaaja2$="TIETOKONE"
+
+//KUVAT//
+StartSearch//Mikä kenttä valittiin
+
+    Repeat
+    
+        file$=FindFile()
+        If Lower(Right(file$,4))=".png" Then 'vain png kuvat hyväksytään
+        amis-1
+        If amis=0 Then Goto kirjoitus
+        EndIf
+    Forever
+    
+   kirjoitus:
+   maasto=LoadImage(file$)
+    
+EndSearch'Loppu etsintä
+ChDir ".."
+ukko1= LoadImage("ukko1.png")//ukko ladataan
+ukko2=LoadImage("ukko2.png")//toinen ukko ladaraan
+pommi=LoadImage("pommi.png")//pommi ykköselle :)
+pommi2=LoadImage("pommi.png")//pommi kakkoselle :)
+pum=LoadImage("räjähdys.png")//Räjähdys pommille yksi
+pum2=LoadImage("räjähdys.png")//Räjähdyspommille kaksi
+miina=LoadImage("miina.png")//miina 1
+miina2=LoadImage("miina.png")//miina 2
+
+pumjätti= MakeImage(250,100)//pienemmät räjähdykset
+DrawToImage pumjätti
+    Color cbyellow
+    Circle 0,35,35
+    Circle 17,20,50
+    Circle 52,0,70
+    Circle 117,20,50
+    Circle 172,25,35
+DrawToScreen
+
+pumjätti2= MakeImage(250,100)//pienemmät räjähdykset
+DrawToImage pumjätti2
+    Color cbyellow
+    Circle 0,35,35
+    Circle 17,20,50
+    Circle 52,0,70
+    Circle 117,20,50
+    Circle 172,25,35
+DrawToScreen
+
+Repeat//päälooppi
+
+    //Pistetään koordinaatit muistiin, tarvitaan törmäyksessä
+    vanhax#=x1#//Ukolle
+    vanhay#=y1#//yksi
+    vanhax2#=x2#//ukolle
+    vanhay2#=y2#//kakso
+    vanhamx#=mx#
+    vanhamy#=my#
+    vanhamx2#=mx2#
+    vanhamy2#=my2#
+    
+    //Hypyn hallintaa: Hyppy (yms. ohjaus) löytyy PELIMAAILAN OMINAISUUKSISTA.
+    hyppy1#-0.7//ykköselle
+    hyppy2#-0.7//kakkoselle
+    
+    //pommin hallintaa:
+    plento#-1//pommille 1
+    If plento<-15 Then plento=-15
+    
+    plento2#-1//pommille 2
+    If plento2<-15 Then plento2=-15
+    
+    //miinan hallintaa 1:
+    mlento#-1
+    If mlento<-15 Then mlento=-15
+    //miinan hallintaa 2:
+    mlento2#-1
+    If mlento2<-15 Then mlento2=-15
+    
+    
+    //////////////////////////////PELIMAAILMAN OMINAISUUDET////////////
+    
+    //Painovoima, johon lisätty hypyn vaikutus ukkoon(pitää olla alussa):
+    y1#= y1#+3-hyppy1#//ukolle yksi
+    y2#= y2#+3-hyppy2#//ukolle kaksi
+    py#= py#+3-plento#//Ykköspelaajan pommin painovoima
+    py2#= py2#+3-plento2#//Kakkospelaajan pommin painovoima
+    my#= my#+3-mlento#//miina ykkönen
+    my2#= my2#+3-mlento2#//miina kakkonen
+    
+    /////////////////POMMIN OMINAISUUKSIA///////////////
+    //Pommin ja miinan 1 lento:
+    If pommitus=1  Then
+        If suunta=0 Then px-5
+        If suunta=1 Then px+5
+    EndIf    
+    If pommitusm1=1 And miinamaassa=0 Then 
+        If suuntam1=0 Then mx-5
+        If suuntam1=1 Then mx+5
+    EndIf
+    //Pommin ja miinan 2 lento:
+    If pommitus2=1 Then
+        If suunta2=0 Then px2-5
+        If suunta2=1 Then px2+5
+    EndIf    
+    If pommitusm2=1 And miinamaassa2=0 Then 
+        If suuntam2=0 Then mx2-5
+        If suuntam2=1 Then mx2+5
+    EndIf
+  
+  
+    //Pommin maahan osuminen(ykköspommi):
+    If ImagesCollide (maasto, maax, maay, 0, pommi, px, py,0)=1 Then
+        räjähdysjouman:'Tarvitaan alla olevaan Gosub komentoon
+       //Kaikki komennot piirretään maasto kuvaan
+        DrawToImage maasto
+        Color cbblack
+        Circle px-35,py-35,70
+        DrawToScreen
+        //^^Tämän jälkeen kaikki piirretään taas näytölle, eikä kuvaan
+        rx=px-35
+        ry=py-35
+        DrawImage pum,rx,ry
+            ////Elkan menettäminen(eli jos räjähdys osuu ukkoon 2)///////
+            If ImagesCollide (pum, rx, ry, 0, ukko2, x2, y2,0)=1 Then 
+            elkka2-15
+            älyhälytys=1
+            EndIf
+        pommitus=0
+        px=1000:py=1000
+        Return 'Palataan gosub kohtaan
+    EndIf
+    
+    //Pommin osuminen ukkoon(ykköspommi)
+    If ImagesCollide (pommi, px, py, 0, ukko2, x2, y2,0)=1 Then 
+        Gosub räjähdysjouman'Mennään tekeen räjähdys
+    EndIf   
+    
+    //Miinan maanhan osuminen, ukko1:
+    If ImagesCollide (maasto, maax, maay, 0, miina, mx, my,0)=1 Then
+        //Kun törmätään miina ei putoa enää vaan vaihdetaan vanhat koordinaatit
+        my#=vanhamy#
+        mx#=vanhamx#
+        //Hyppy nollataan
+        mlento#=0
+        //miinat nollataan
+        miinamaassa=1
+        If laskenta>-2 Then Goto yli
+        laskenta= FPS()*4
+        yli:
+    EndIf
+    
+    If laskenta=1 Then
+        miinaräjähdys:
+       //Kaikki komennot piirretään maasto kuvaan
+        DrawToImage maasto
+        Color cbblack
+        Circle mx-35,my-35,70
+        Circle mx+30,my-17,50
+        Circle mx+65,my-7,35
+        Circle mx-70,my-17,50
+        Circle mx-87,my-7,35
+        DrawToScreen
+        //^^Tämän jälkeen kaikki piirretään taas näytölle, eikä kuvaan
+        rxm=mx-87
+        rym=my-35
+        DrawImage pumjätti,rxm,rym
+            ////Elkan menettäminen(eli jos räjähdys osuu ukkoon 2)///////
+            If ImagesCollide (pumjätti, rxm, rym, 0, ukko2, x2, y2,0)=1 Then 
+            elkka2-15
+            EndIf
+            If ImagesCollide (pumjätti, rxm, rym, 0, ukko1, x1, y1,0)=1 Then 
+            elkka-15
+            EndIf
+        pommitusm1=0
+        miinamaassa=0
+        mx=1000:my=1000
+        Return
+    EndIf
+    
+     
+    //Pommin maahan osuminen(kakkospommi):
+    If ImagesCollide (maasto, maax, maay, 0, pommi2, px2, py2,0)=1 Then
+        räjähdysjouman2:'Kts ykkös pommi
+        //Kaikki komennot piirretään maasto kuvaan
+        DrawToImage maasto
+        Color cbblack
+        Circle px2-35,py2-35,70
+        DrawToScreen
+        //^^Tämän jälkeen kaikki piirretään taas näytölle, eikä kuvaan
+        rx2=px2-35
+        ry2=py2-35
+        DrawImage pum2,rx2,ry2
+            ////Elkan menettäminen(eli jos räjähdys osuu ukkoon 1)///////
+            If ImagesCollide (pum2, rx2, ry2, 0, ukko1, x1, y1,0)=1 Then 
+            elkka-15
+            EndIf
+        pommitus2=0
+        px2=1000:py2=1000
+        Return
+    EndIf
+    
+    //Pommin osuminen ukkoon(kakkospommi)
+    If ImagesCollide (pommi2, px2, py2, 0, ukko1, x1, y1,0)=1 Then 
+        Gosub räjähdysjouman2'Mennään tekeen räjähdys
+    EndIf    
+    
+    //Miinan maanhan osuminen, ukko1:
+    If ImagesCollide (maasto, maax, maay, 0, miina2, mx2, my2,0)=1 Then
+        //Kun törmätään miina ei putoa enää vaan vaihdetaan vanhat koordinaatit
+        my2#=vanhamy2#
+        mx2#=vanhamx2#
+        //Hyppy nollataan
+        mlento2#=0
+        //miinat nollataan
+        miinamaassa2=1
+        If laskenta2>-2 Then Goto yli2
+        laskenta2= FPS()*4
+        yli2:
+    EndIf
+    
+    If laskenta2=1 Then
+        miinaräjähdys2:
+       //Kaikki komennot piirretään maasto kuvaan
+        DrawToImage maasto
+        Color cbblack
+        Circle mx2-35,my2-35,70
+        Circle mx2+30,my2-17,50
+        Circle mx2+65,my2-7,35
+        Circle mx2-70,my2-17,50
+        Circle mx2-87,my2-7,35
+        DrawToScreen
+        //^^Tämän jälkeen kaikki piirretään taas näytölle, eikä kuvaan
+        rxm2=mx2-87
+        rym2=my2-35
+        DrawImage pumjätti2,rxm2,rym2
+            ////Elkan menettäminen(eli jos räjähdys osuu ukkoon 2)///////
+            If ImagesCollide (pumjätti2, rxm2, rym2, 0, ukko2, x2, y2,0)=1 Then 
+            elkka2-15
+            EndIf
+            If ImagesCollide (pumjätti2, rxm2, rym2, 0, ukko1, x1, y1,0)=1 Then 
+            elkka-15
+            EndIf
+        pommitusm2=0
+        miinamaassa2=0
+        mx2=1000:my2=1000
+        Return
+    EndIf
+    
+    
+    
+    //Pommit tuhotaan, jos se menee yli rajojen:
+    If px>800 Or px<0 Then pommitus=0'Ykkös-
+    If py>620 Then pommitus=0'pommi
+    If px2>800 Or px2<0 Then pommitus2=0'kakkos-
+    If py2>620 Then pommitus2=0'pommi
+    //Miina tuhotaan, jos se menee yli rajojen:
+    If mx>800 Or mx<0 Then pommitusm1=0'Ykkös-
+    If my>620 Then pommitusm1=0'miina
+    If mx2>800 Or mx2<0 Then pommitusm2=0'kakkos-
+    If my2>620 Then pommitusm2=0'miina
+    
+    /////////////////////////////////////////////////////////
+    
+    
+    //Elämä pois(ELI ELKKA LOPPUU tai RAJOJEN YLITTÄMINEN)
+    If y1#>600 Or elkka<0 Then elama-1:x1#=750.0:y1#=0.0:elkka=100
+    If y2#>600 Or elkka2<0 Then elama2-1:x2#=50.0:y2#=0.0:elkka2=100
+    
+    //kuolema eli elämät=0
+    If elama=0 Then
+       SetFont arial
+        Color cbdarkred
+        Text 160,200,""+pelaaja2$+" VOITTI!"
+        DrawScreen
+        Wait 4000
+        StopSound musa
+        Goto valikko
+    EndIf
+    
+    If elama2=0 Then
+        SetFont arial
+        Color cbdarkred
+        Text 160,200,"PELAAJA 1 VOITTI!"
+        DrawScreen
+        Wait 4000
+        StopSound musa
+        Goto valikko
+        
+    EndIf
+    ////////////////////////////////////////////////////////////////
+    
+    //Törmäys ja OHJAUS ukolle YKSI/////////////////////////////////:
+    If ImagesCollide (maasto, maax, maay, 0, ukko1, x1, y1,0)=1 Then
+        //Kun törmätään ukko ei putoa enää vaan vaihdetaan vanhat koordinaatit
+        y1#=vanhay#
+        x1#=vanhax#
+        //Hyppy nollataan
+        hyppy1#=0
+        //Vähän säätöö...:
+        If LeftKey() Then 
+            y1-2 
+            If pommitus=0 Then suunta=0
+            If pommitusm1=0 Then suuntam1=0
+            If ImagesCollide (maasto, maax, maay, 0, ukko1, x1, y1,0)=1 Then 
+                x1#+2: y1#+2
+                If ImagesCollide (maasto, maax, maay, 0, ukko1, x1, y1,0)=1 Then x1#-5
+            EndIf
+        EndIf
+        If RightKey() Then 
+            y1-2
+            If pommitus=0 Then suunta=1
+            If pommitusm1=0 Then suuntam1=0
+            If ImagesCollide (maasto, maax, maay, 0, ukko1, x1, y1,0)=1 Then 
+                x1#-2:y1#+2
+                If ImagesCollide (maasto, maax, maay, 0, ukko1, x1, y1,0)=1 Then x1#+5
+            EndIf
+        EndIf
+        //Hyypy lähtee aina maasta ei ilmasta:
+        If UpKey() And hyppy1#<1 Then hyppy1#=15
+        //Törmäys kattoon:
+        If hyppy1#>2.9 And ImagesCollide (maasto, maax, maay, 0, ukko1, x1, y1,0)=1 Then hyppy1#=0
+    EndIf
+    /////////////////////////////////////////////////////////////
+    
+     //Törmäys ja OHJAUS ukolle KAKSI/////////////////////////////////:
+    If ImagesCollide (maasto, maax, maay, 0, ukko2, x2, y2,0)=1 Then
+        //Kun törmätään ukko ei putoa enää vaan vaihdetaan vanhat koordinaatit
+        y2#=vanhay2#
+        x2#=vanhax2#
+        //Hyppy nollataan
+        hyppy2#=0
+        //Vähän säätöö...:
+        If KeyDown(30) Or vasen=1 Then 
+            y2-2
+            If pommitus2=0 Then suunta2=0
+            If pommitusm2=0 Then suuntam2=0
+            If ImagesCollide (maasto, maax, maay, 0, ukko2, x2, y2,0)=1 Then 
+                x2#+2: y2#+2
+                If ImagesCollide (maasto, maax, maay, 0, ukko2, x2, y2,0)=1 Then x2#-5
+            EndIf
+        EndIf
+        If KeyDown(32) Or oikea=1 Then 
+            y2-2
+            If pommitus2=0 Then suunta2=1
+            If pommitusm2=0 Then suuntam2=1
+            If ImagesCollide (maasto, maax, maay, 0, ukko2, x2, y2,0)=1 Then 
+                x2#-2:y2#+2
+                If ImagesCollide (maasto, maax, maay, 0, ukko2, x2, y2,0)=1 Then x2#+5
+            EndIf
+        EndIf
+        //Hyppy lähtee aina maasta ei ilmasta:
+        If aly=1 Then Goto asdasdasd
+        If KeyDown(17) And hyppy2#<1 Then hyppy2#=15
+        asdasdasd:
+        If haluuhyppy=1 And hyppy2#<1 Then hyppy2#=15
+        
+        //Törmäys kattoon:
+        If hyppy2#>2.9 And ImagesCollide (maasto, maax, maay, 0, ukko2, x2, y2,0)=1 Then hyppy2#=0
+    EndIf
+    /////////////////////////////////////////////////////////////
+    
+      //Ohjaus 1:
+    If LeftKey() And ImagesCollide (maasto, maax, maay, 0, ukko1, x1, y1,0)=0 Then
+        x1-2
+        If pommitus=0 Then suunta=0
+        If pommitusm1=0 Then suuntam1=0
+    EndIf
+    If RightKey() And ImagesCollide (maasto, maax, maay, 0, ukko1, x1, y1,0)=0 Then
+        x1+2
+        If pommitus=0 Then suunta=1
+        If pommitusm1=0 Then suuntam1=1
+    EndIf
+    //Aseen vaihto pelaaja 1:
+    If KeyDown(28) And Timer()>record+500  Then ase=-ase: record=Timer()
+   
+   
+    If aly=1 Then Goto jalavei//Hypitään yli tekoälyn olessa päällä
+    //Ohjaus 2
+    If KeyDown(30) And ImagesCollide (maasto, maax, maay, 0, ukko2, x2, y2,0)=0 Then 
+        vasenta: 
+        x2-2
+        If pommitus2=0 Then suunta2=0
+        If pommitusm2=0 Then suuntam2=0
+        Return
+    EndIf
+    If KeyDown(32) And ImagesCollide (maasto, maax, maay, 0, ukko2, x2, y2,0)=0 Then 
+        oikeeta:
+        x2+2
+        If pommitus2=0 Then suunta2=1
+        If pommitusm2=0 Then suuntam2=1
+        Return
+    EndIf
+
+    //aseen vaihto pelaaja 2
+    If KeyDown(16) And Timer()>record2+500  Then ase2=-ase2: record2=Timer()
+    jalavei:
+    
+    //Pommin heitto pelaaja 1:
+    If aseenlataus>-1 Then aseenlataus-1
+    If KeyHit(52) And pommitus=0 Then 
+        If ase=1 And aseenlataus<0 Then
+        px=x1+10
+        py=y1+20
+        pommitus=1
+        plento=15
+        aseenlataus=10
+        EndIf
+    EndIf
+    //miina
+    If KeyHit(52) And pommitusm1=0 Then
+        If ase=-1 And lataus=0 Then
+        mx#=x1+10
+        my#=y1+20
+        pommitusm1=1
+        mlento=15
+        laskenta=-5
+        EndIf
+    EndIf
+
+    //Pommin heitto pelaaja 2:
+    If aly=1 Then Goto lol
+    If aseenlataus2>-1 Then aseenlataus2-1
+    If KeyHit(29) And pommitus2=0 Then 
+        pommittaa:
+        If ase2=1 And aseenlataus2<0 Then
+        px2=x2+10
+        py2=y2+20
+        pommitus2=1
+        plento2=15
+        aseenlataus2=10
+        EndIf
+        Return
+    EndIf
+    //miina
+    If KeyHit(29) And pommitusm2=0 Then
+        If ase2=-1 And lataus2=0 Then
+        mx2#=x2+10
+        my2#=y2+20
+        pommitusm2=1
+        mlento2=15
+        laskenta2=-5
+        EndIf
+    EndIf
+    
+    lol:
+    //Lopetus://
+    If EscapeKey() Then StopSound musa: Goto valikko
+    
+    /////////////TEKOÄLY://////////////////////////////////////////////////////
+    If aly=1 Then 
+        If aseenlataus2>-1 Then aseenlataus2-1
+        If bugilataus>-2 Then bugilataus-1
+        If kävelynlataus>-2 Then 
+            kävelynlataus-1
+        EndIf
+        If kävelynlataus<-2 Then kävelynlataus=-2
+        haluuhyppy=0
+        If x2<x1 And kävelynlataus<1 Then oikea=1: vasen=0
+        If x2>x1 And kävelynlataus<1 Then vasen=1: oikea=0
+        If oikea=1 And ImagesCollide (maasto, maax, maay, 0, ukko1, x1, y1,0)=0 Then Gosub oikeeta
+        If vasen=1 And ImagesCollide (maasto, maax, maay, 0, ukko1, x1, y1,0)=0 Then Gosub vasenta   
+        'haluuhyppy=0ei,1juu
+        'oikea=0ei,1juu
+        'hyppy ilmassa:oikeeta-vasenta
+        'vasen=0ei,1juu
+        'pommittaa
+        If pommitus2=0 And kävelynlataus=0 Then 
+                Gosub pommittaa
+                haluuhyppy=1
+        EndIf
+        If pommitus2=0 Then
+            If (y1-y2)<110 And (y1-y2)>-110 Then
+                If (x1-x2)<200 And (x1-x2)>-200 Then  Gosub pommittaa
+            EndIf
+        EndIf
+        
+        If älyhälytys=1 Then haluuhyppy=1: älyhälytys=0
+       
+        If ImagesCollide (maasto, maax, maay, 0, ukko2, x2, y2,0)=1 And x2#=vanhax2# And bugilataus<0 Then
+            If vasen=1 Then oikea=1:vasen=0: kävelynlataus=10
+            If oikea=1 Then vasen=1:oikea=0: kävelynlataus=10
+            bugilataus=10
+        EndIf
+    EndIf
+    
+
+    //////////////////////////////////////////////////////////////////////////
+    
+    ////YLÄ KIRJOTUKSET: elkkapalkki, ase yms./////
+    //Pelaajan yksi:
+    If ase=1 Then aseesi$="POMMI"
+    If ase=-1 Then aseesi$="MIINA"
+    SetFont perus
+    Color cbdarkred
+    Text 675,5,"PELAAJA 1"
+    Text 675,22,"ASE: "+aseesi$
+    Box 675,40,elkka,20
+    Text 675,65,"ELÄMÄT: "+elama
+    Color cbblack
+    Box 675,40,100,20,OFF
+    
+    //Pelaajan kaksi:
+    If ase2=1 Then aseesi2$="POMMI"
+    If ase2=-1 Then aseesi2$="MIINA"
+    SetFont perus
+    Color cbgreen
+    Text 25,5,""+pelaaja2$
+    Text 25,22,"ASE: "+aseesi2$
+    Box 25,40,elkka2,20 
+    Text 25,65,"ELÄMÄT: "+elama2
+    Color cbblack
+    Box 25,40,100,20,OFF
+    
+    /////////////////////////MUSIIKKI/////////////////////////////
+    If pälli=0 Then
+    If SoundPlaying(musa)=0 Then //Jos musa loppuu niin uutta kehiin
+        musa = PlaySound ("pelijami.ogg")
+    EndIf
+    EndIf
+    
+    If KeyDown (50) Then StopSound musa: pälli=1'Musat pois
+    
+    //////////////////////////////////////////////////////////////////
+    //Piirrot, jotka pitää suorittaa lopussa:
+    DrawImage maasto,maax,maay//maasto piirretään
+    
+    DrawImage ukko1,x1,y1//Ensimmäinen ukko piirretään
+    DrawImage ukko2,x2,y2//Ensimmäinen ukko piirretään
+    ///////////POMMIN PIIRTO/////////////
+    DrawImage pommi,px,py
+    DrawImage pommi2,px2,py2
+    DrawImage miina,mx#,my#
+    DrawImage miina2,mx2#,my2#
+    'Räjähdykset:
+    DrawImage pum,rx#,ry#//räjähdys
+    DrawImage pum2,rx2#,ry2#//räjähdys
+    DrawImage pumjätti,rxm,rym//Jätti räjähys
+    DrawImage pumjätti2,rxm2,rym2//Jätti räjähys2
+    rx=1000
+    ry=1000
+    rx2=1000
+    ry2=1000
+    rxm=1000
+    rym=1000
+    rxm2=1000
+    rym2=1000
+    
+    //lopussa pitää olla että teksti näkyy, kentän pääll':
+    If laskenta>=-1 Then 
+        laskenta-1
+        Color cbblack
+        aika=laskenta/FPS()
+        Text mx#+15,my#+5,""+aika
+    EndIf
+    If laskenta2>=-1 Then 
+        laskenta2-1
+        Color cbblack
+        aika2=laskenta2/FPS()
+        Text mx2#+15,my2#+5,""+aika2
+    EndIf
+    
+    DrawScreen//piirretään näyttö
+Forever
+'----------------------------------------------------------------------------
+
+////////////////////////////VÄLIVALIKOT 2///////////////////////
+Väli2:
+Wait 200
+
+//Kuvia välivalikkoon:
+pudotusb=MakeImage (190,30)//Luodaan pudotettava valikko
+DrawToImage pudotusb
+Color cbdark
+Box 0,0,190,30,0
+Color cbwhite
+Box 1,1,188,28,1
+DrawToScreen
+////////////////
+
+//Muuttujat valikkoon:
+pudotusy=70
+pudotusx=280
+kenttävalinta=0
+amis=0
+
+////////////////KENTTIEN ETSINTÄ////////////////////////
+ChDir "Urpokentät"'etitään kentät kansiosta kentät
+
+StartSearch//Kenttien etsintä
+
+    Repeat
+    
+        file$=FindFile()
+        If file$="" Then Exit ' kun ei ole kansioita, paetaan silmukasta
+        
+        If Lower(Right(file$,4))=".png" Then 'vain png kuvat hyväksytään
+            kenttä.BOXIT = New(BOXIT) 'luo uusi pudotuskuva
+            kenttä\sisältö= CloneImage(pudotusb) 'tee klooni kuvasta
+            DrawToImage kenttä\sisältö//Kirjoitetanaan
+                Color cbdark//        pudotusvalikkoon   
+                SetFont kenttäfontti2
+                Text 10,0, file$//     kentän nimi
+            DrawToScreen
+
+        EndIf
+        
+        DrawScreen
+    Forever
+
+EndSearch'Loppu etsintä
+
+
+/////////////////////ITSE VALIKKO//////////////////////////////
+Repeat
+
+    
+    If pälli=0 Then
+    If SoundPlaying(menumusa)=0 Then //Jos musa loppuu niin uutta kehiin
+        menumusa = PlaySound ("menumusa.ogg")
+    EndIf
+    EndIf
+    
+    If KeyDown (50) Then StopSound menumusa: pälli=1'Musat pois
+
+    ShowMouse hiiri//hiiren kuvake
+    DrawImage hiirenpallo,MouseX(),MouseY()//hiiren kosketuspiste
+       
+    For kenttä.BOXIT = Each BOXIT//Etitään kentät ja piirretään ne valittaviksi
+        pudotusy+29'Piirretään jokainen eri koordinaatteihin...
+        kenttävalinta+1'...alekkain
+        If pudotusy>550 Then pudotusy=100:pudotusx+195'Ja viereisen rivin vaihto
+        DrawImage kenttä\sisältö,pudotusx,pudotusy'Itse kuvan piirto
+        If ImagesCollide(hiirenpallo,MouseX(),MouseY(),0,kenttä\sisältö,pudotusx,pudotusy,0) Then
+            Color cborange'^^Jos hiiri on päällä niin...
+            Box pudotusx,pudotusy,190,29,0'...piirretään oranssi boxi
+            If MouseUp(1) Then amis=kenttävalinta:Goto Special'Kentän valinta
+        EndIf
+    Next kenttä
+    pudotusy=70'Nollataan piirto koordinaatit
+    pudotusx=100'^^
+    kenttävalinta=0'Ja kentän valinta tsydeemi
+    
+    //TEKSTIT://
+    Color 255,194,14
+    SetFont verdanako
+    Text 100,50,"KENTTÄ:"    
+    
+    DrawScreen
+Forever
+
+
+Special:
+/////////////!!!!SPECIALKENTÄT!!!!//////////////////////
+
+ShowMouse OFF//hiiri pois näkyvistä
+StopSound menumusa//Musa loppu
+SCREEN 1000,750//Kuvan leveys
+SAFEEXIT OFF'Turvapoistuminen pois
+
+
+For kenttä.BOXIT = Each BOXIT//Poistetaan tyypit muistista:
+    DeleteImage kenttä\sisältö
+    Delete kenttä
+Next kenttä
+
+
+arial=LoadFont("Verdana",55,ON)
+perus=LoadFont("arial",15)
+
+/////////////////////////////////////PELI/////////////////////////////////
+//Taustan väri//
+Cls'Näyttö puhtaaksi
+ClsColor 0,164,255//Tausta väri
+
+//MUUTTUJAT\\
+'Ykkösukolle:
+hyppy1#=0
+elkka=100
+'ykkösen pommi
+suunta=0
+pommitus=0
+plento#=0.0
+'kakkosukolle:
+hyppy2#=0
+elkka2=100
+'kakkosen pommi:
+suunta2=0
+pommitus2=0
+plento2#=0.0
+//Pommien koordinaatit:
+px#=1000
+py#=1000
+px2#=1000
+py2#=1000
+//Räjähdykset:
+rx#=1000
+ry#=1000
+rx2#=1000
+ry2#=1000
+'Laivat:
+laivaelkka=99
+laivaelkka2=99
+laivasuunta=-1
+laivasuunta2=1
+//Animaatiojutut:
+t1=0 'tykin animaatio frame
+t2=0 ' sama kakkostykille
+//Aseet
+ase=0
+ase2=0
+aselaiva=0
+aselaiva2=0
+//Muut randomit:
+maax=0//Missä maa on-
+maay=0//melko turha
+tykkivalmiina=0
+tykkivalmiina2=0
+voima#=0
+voima2#=0
+sisalla=0
+sisalla2=0
+buglog=0
+buglog2=0
+bugaanaliohjelmassa=0
+bugaanaliohjelmassa2=0
+tuhoutunut=0
+tuhoutunut2=0
+pälli=0
+
+//KUVAT//
+StartSearch//Mikä kenttä valittiin
+
+    Repeat
+    
+        file$=FindFile()
+        If Lower(Right(file$,4))=".png" Then 'vain png kuvat hyväksytään
+        amis-1
+        If amis=0 Then Goto kirjoitus2
+        EndIf
+    Forever
+    
+   kirjoitus2:
+maasto=LoadImage(file$)//MAASTO LADATAAN
+
+kulku$=Lower(Replace(file$,".png",".txt"))
+
+kulkutiedot=OpenToRead(kulku$)'avataan tiedosto, mistä löytyy tykkien/laivojen
+    tykkix#=ReadLine(kulkutiedot)'sijainnit. Luetaan rivejä...
+    tykkiy#=ReadLine(kulkutiedot)'...ja asetetaan muuttujat oikein
+    tykkix2#=ReadLine(kulkutiedot)
+    tykkiy2#=ReadLine(kulkutiedot)
+    laivax#=ReadLine(kulkutiedot)
+    laivay#=ReadLine(kulkutiedot)
+    laivax2#=ReadLine(kulkutiedot)
+    laivay2#=ReadLine(kulkutiedot)
+    x1#=ReadLine(kulkutiedot)
+    y1#=ReadLine(kulkutiedot)
+    x2#=ReadLine(kulkutiedot)
+    y2#=ReadLine(kulkutiedot)
+CloseFile kulkutiedot'suljetaan
+
+EndSearch'Loppu etsintä
+
+ChDir ".."'Hypätään ylempään kansioon
+
+ukko1= LoadImage("ukkopieni1.png")//ukko ladataan
+ukko2=LoadImage("ukkopieni2.png")//toinen ukko ladaraan
+pommi=LoadImage("pommipieni.png")//pommi ykköselle :)
+pommi2=CloneImage (pommi)//pommi kakkoselle :)
+pum=LoadImage("räjähdyspieni.png")//Räjähdys pommille yksi
+pum2=CloneImage (pum)//Räjähdyspommille kaksi
+tykki=LoadAnimImage("tykki.png",30,25,0,3)//tykki 
+tykki2=LoadAnimImage("tykki2.png",30,25,0,3)//kakkostykki
+laiva=LoadImage("ilmalaiva.png")//ilmalaiva
+laiva2=CloneImage (laiva)//lilmalaiva2
+ohjuskuva=LoadImage("ohjus.png")//Ohjus
+'räjäytykset ohjuksille:
+
+For b=0 To 2
+    OHJUS(b,2) = CloneImage(pum)
+Next b
+For b=0 To 2
+    OHJUS2(b,2) = CloneImage(pum)
+Next b
+
+Repeat//päälooppi
+
+    //Pistetään koordinaatit muistiin, tarvitaan törmäyksessä yms.
+    vanhax#=x1#//Ukolle
+    vanhay#=y1#//yksi
+    vanhax2#=x2#//ukolle
+    vanhay2#=y2#//kaksi
+    vanhatykkix#=tykkix#
+    vanhatykkiy#=tykkiy#
+    vanhatykkix2#=tykkix2#
+    vanhatykkiy2#=tykkiy2#
+    vanhalaivax#=laivax#
+    vanhalaivay#=laivay#
+    vanhalaivax2#=laivax2#
+    vanhalaivay2#=laivay2#
+    
+    //Hypyn hallintaa: Hyppy (yms. ohjaus) löytyy PELIMAAILAN OMINAISUUKSISTA.
+    hyppy1#-0.7//ykköselle
+    hyppy2#-0.7//kakkoselle
+    tykkiy#+2'katapulteille
+    tykkiy2#+2'...
+    laivay#+1'ilmalaivoille
+    laivay2#+1'... 
+    //pommin hallintaa:
+    plento#-0.7//pommille 1
+    If plento<-15 Then plento=-15
+    plento2#-0.7//pommille 2
+    If plento2<-15 Then plento2=-15
+    
+    //////////////////////////////PELIMAAILMAN OMINAISUUDET////////////
+    
+    //Painovoima, johon lisätty hypyn vaikutus ukkoon:
+    y1#= y1#+2-hyppy1#//ukolle yksi
+    y2#= y2#+2-hyppy2#//ukolle kaksi
+    py#= py#+2-plento#//Ykköspelaajan pommin painovoima
+    py2#= py2#+2-plento2#//Kakkospelaajan pommin painovoima
+    
+    /////////////////POMMIN OMINAISUUKSIA///////////////
+    //Pommin 1 lento:
+    If pommitus=1 Then
+        If suunta=0 Then px#-2.5
+        If suunta=1 Then px#+2.5
+    EndIf    
+    //Tykillä ammuttu pommi:
+    If pommitus=2 Then px# = px#-5-(voima#/5)
+    //Ilmalaivalla pudotettu pommi:
+    If pommitus=3 Then px# = px#+0
+        
+    //Pommin 2 lento:
+    If pommitus2=1 Then
+        If suunta2=0 Then px2#-2.5
+        If suunta2=1 Then px2#+2.5
+    EndIf   
+    //Tykillä ammuttu pommi:
+    If pommitus2=2 Then px2# = px2#+5+(voima2#/5)
+    //Ilmalaivalla pudotettu pommi:
+    If pommitus2=3 Then px2# = px2#+0
+    
+    If pommitus=0 Then px=1000:plento=0'esto pommiin1
+    If pommitus2=0 Then px2=1000:plento2=0'esto pommiin 2
+  
+    //Pommin maahan osuminen(ykköspommi):
+    If ImagesCollide (maasto, maax, maay, 0, pommi, px, py,0)=1 Then
+        räjähdys:'Tarvitaan alla olevaan Gosub komentoon
+       //Kaikki komennot piirretään maasto kuvaan
+        DrawToImage maasto
+        Color cbblack
+        Circle px-20,py-20,40
+        DrawToScreen
+        //^^Tämän jälkeen kaikki piirretään taas näytölle, eikä kuvaan
+        rx=px-20
+        ry=py-20
+        DrawImage pum,rx,ry
+            ////Elkan menettäminen(eli jos räjähdys osuu ukkoon 2)///////
+            If ImagesCollide (pum, rx, ry, 0, ukko2, x2, y2,0)=1 Then 
+            elkka2-15
+            EndIf
+            If ImagesCollide (pum2, rx2, ry2, 0, ukko2, x2, y2,0)=1 Then 
+            elkka2-15
+            EndIf
+            //Ilmalaivan hajoaminen:
+            If ImagesOverlap(pommi, px, py, laiva2, laivax2, laivay2) Then laivaelkka2-20
+        pommitus=0
+        voima=0
+        px=1000:py=1000
+        Return 'Palataan gosub kohtaan
+    EndIf
+    
+    //Pommin osuminen ukkoon(ykköspommi)
+    If ImagesCollide (pommi, px, py, 0, ukko2, x2, y2,0)=1 Then Gosub räjähdys'Mennään tekeen räjähdys
+    
+    //Pommin osuminen ilmalaivaan
+    If ImagesOverlap(pommi, px, py, laiva2, laivax2, laivay2) Then Gosub räjähdys
+        
+    //Pommin maahan osuminen(kakkospommi):
+    If ImagesCollide (maasto, maax, maay, 0, pommi2, px2, py2,0)=1 Then
+        räjähdys2:'Kts ykkös pommi
+        //Kaikki komennot piirretään maasto kuvaan
+        DrawToImage maasto
+        Color cbblack
+        Circle px2-20,py2-20,40
+        DrawToScreen
+        //^^Tämän jälkeen kaikki piirretään taas näytölle, eikä kuvaan
+        rx2=px2-20
+        ry2=py2-20
+        DrawImage pum2,rx2,ry2
+            ////Elkan menettäminen(eli jos räjähdys osuu ukkoon 1)///////
+            If ImagesCollide (pum2, rx2, ry2, 0, ukko1, x1, y1,0)=1 Then 
+            elkka-15
+            EndIf
+            If ImagesCollide (pum, rx, ry, 0, ukko1, x1, y1,0)=1 Then 
+            elkka-15
+            EndIf
+            //Ilmalaivan hajoaminen:
+            If ImagesOverlap(pommi2, px2, py2, laiva, laivax, laivay) Then laivaelkka-20
+        pommitus2=0
+        voima2=0
+        px2=1000:py2=1000
+        Return
+    EndIf
+    
+    //Pommin osuminen ukkoon(kakkospommi)
+    If ImagesCollide (pommi2, px2, py2, 0, ukko1, x1, y1,0)=1 Then Gosub räjähdys2'Mennään tekeen räjähdys
+    
+    //Pommin osuminen ilmalaivaan
+    If ImagesOverlap(pommi2, px2, py2, laiva, laivax, laivay) Then Gosub räjähdys2
+    
+    //Pommit tuhotaan, jos se menee yli rajojen:
+    If px>1010 Or px<-20 Then pommitus=0:voima=0'Ykkös-
+    If py>800 Then pommitus=0:voima=0'pommi
+    If px2>1010 Or px2<-20 Then pommitus2=0:voima2=0'kakkos-
+    If py2>800 Then pommitus2=0:voima2=0'pommi
+    //////////////////////////////////////////////////////////////
+    
+    //Törmäys ja OHJAUS ukolle YKSI/////////////////////////////////:
+    If ImagesCollide (maasto, maax, maay, 0, ukko1, x1, y1,0)=1 Then
+        //Kun törmätään ukko ei putoa enää vaan vaihdetaan vanhat koordinaatit
+        y1#=vanhay#
+        x1#=vanhax#
+        //Hyppy nollataan
+        hyppy1#=0
+        //Vähän säätöö...:
+        If LeftKey() Then 
+            y1#-1
+            If pommitus=0 Then suunta=0
+            If ImagesCollide (maasto, maax, maay, 0, ukko1, x1, y1,0)=1 Then 
+                x1#+0.8: y1#+1
+                If ImagesCollide (maasto, maax, maay, 0, ukko1, x1, y1,0)=1 Then x1#-1
+            EndIf
+        EndIf
+        If RightKey() Then 
+            y1#-1
+            If pommitus=0 Then suunta=1
+            If ImagesCollide (maasto, maax, maay, 0, ukko1, x1, y1,0)=1 Then 
+                x1#-0.8:y1#+1
+                If ImagesCollide (maasto, maax, maay, 0, ukko1, x1, y1,0)=1 Then x1#+1
+            EndIf
+        EndIf
+        //Hyypy lähtee aina maasta ei ilmasta:
+        If UpKey() And hyppy1#<1 Then hyppy1#=10
+        //Törmäys kattoon:
+        If hyppy1#>2.9 And ImagesCollide (maasto, maax, maay, 0, ukko1, x1, y1,0)=1 Then hyppy1#=0
+    EndIf
+    
+    /////////////////////////////////////////////////////////////////////////
+    
+    
+     //Törmäys ja OHJAUS ukolle KAKSI/////////////////////////////////:
+    If ImagesCollide (maasto, maax, maay, 0, ukko2, x2, y2,0)=1 Then
+        //Kun törmätään ukko ei putoa enää vaan vaihdetaan vanhat koordinaatit
+        y2#=vanhay2#
+        x2#=vanhax2#
+        //Hyppy nollataan
+        hyppy2#=0
+        //Vähän säätöö...:
+        If KeyDown(30) Then 
+            y2-1
+            If pommitus2=0 Then suunta2=0
+            If ImagesCollide (maasto, maax, maay, 0, ukko2, x2, y2,0)=1 Then 
+                x2#+0.8: y2#+1
+                If ImagesCollide (maasto, maax, maay, 0, ukko2, x2, y2,0)=1 Then x2#-1
+            EndIf
+        EndIf
+        If KeyDown(32) Then 
+            y2-1
+            If pommitus2=0 Then suunta2=1
+            If ImagesCollide (maasto, maax, maay, 0, ukko2, x2, y2,0)=1 Then 
+                x2#-0.8:y2#+1
+                If ImagesCollide (maasto, maax, maay, 0, ukko2, x2, y2,0)=1 Then x2#+1
+            EndIf
+        EndIf
+        //Hyypy lähtee aina maasta ei ilmasta:
+        If KeyDown(17) And hyppy2#<1 Then hyppy2#=10
+        //Törmäys kattoon:
+        If hyppy2#>2.9 And ImagesCollide (maasto, maax, maay, 0, ukko2, x2, y2,0)=1 Then hyppy2#=0
+    EndIf
+    /////////////////////////////////////////////////////////////
+    
+      //Ohjaus:
+    If LeftKey() And ImagesCollide (maasto, maax, maay, 0, ukko1, x1, y1,0)=0 Then
+        x1-0.8
+        If pommitus=0 Then suunta=0
+    EndIf
+    If RightKey() And ImagesCollide (maasto, maax, maay, 0, ukko1, x1, y1,0)=0 Then
+        x1+0.8
+        If pommitus=0 Then suunta=1
+    EndIf
+    If KeyDown(30) And ImagesCollide (maasto, maax, maay, 0, ukko2, x2, y2,0)=0 Then 
+        x2-0.8
+        If pommitus2=0 Then suunta2=0
+    EndIf
+    If KeyDown(32) And ImagesCollide (maasto, maax, maay, 0, ukko2, x2, y2,0)=0 Then 
+        x2+0.8
+        If pommitus2=0 Then suunta2=1
+    EndIf
+    
+    //Pommin heitto pelaaja 1:
+    If KeyHit(52) And pommitus=0 Then 
+        tplento=0
+        tpxlento=0
+        px=x1+6
+        py=y1+10
+        pommitus=1
+        plento=10
+    EndIf
+    
+    //Pommin ampuminen tykillä. Alempana lataus..
+    If KeyDown(52)=0 And pommitus=0 And tykkivalmiina=1 Then  
+        px=tykkix
+        py=tykkiy
+        pommitus=2 'HUOM.huomaa "pommitus = !!!2!!!"
+        tykkivalmiina=0
+        plento#=voima#
+        t1=0'animaatio, katapultti normaalitilaan
+    EndIf
+        
+    
+    //Pommin heitto:
+    If KeyHit(29) And pommitus2=0 Then 
+        px2=x2+6
+        py2=y2+10
+        pommitus2=1
+        plento2=10
+    EndIf
+    
+     //Pommin ampuminen tykillä. Alempana lataus..
+    If KeyDown(29)=0 And pommitus2=0 And tykkivalmiina2=1 Then  
+        px2=tykkix2
+        py2=tykkiy2
+        pommitus2=2 'HUOM.huomaa "pommitus = !!!2!!!"
+        tykkivalmiina2=0
+        plento2#=voima2#
+        t2=0'animaatio, katapultti normaalitilaan
+    EndIf
+        
+    
+    //UKKO1 JA TYKKI://///////////////////////////////////////////////
+    If ImagesOverlap(ukko1,x1,y1,tykki,tykkix,tykkiy) And KeyDown(52) Then 
+        If pommitus=0 Or pommitus=1 Then
+            t1=1'animaatiota, katapultti kallistuu, mitä enemmän voimaa
+            If voima<30 Then voima#+1  // Tai oikeastaan lataus 
+            pommitus=0
+            tykkivalmiina=1
+            Color cbdark
+            Box tykkix,tykkiy-15,32,10,0
+            Color cbred
+            Box tykkix+1,tykkiy-14,voima#,8,1
+            If voima>15 Then t1=2'animaatiota edelleen...  
+        EndIf
+    EndIf
+    
+    If ImagesOverlap(ukko1,x1,y1,tykki,tykkix,tykkiy) And KeyDown(208) Then
+            If KeyDown(203) Then  tykkix#-0.8:tykkiy#-2
+            If KeyDown(205) Then tykkix#+0.8:tykkiy#-2
+    EndIf
+    
+    //Törmäys tykeille/katapulteille 1:
+    If ImagesCollide (maasto, maax, maay, 0, tykki, tykkix#, tykkiy#,0) Then tykkix#=vanhatykkix#:tykkiy#=vanhatykkiy#
+    
+    //UKKO2 JA TYKKI:////////////////////////////////////////////////
+    If ImagesOverlap(ukko2,x2,y2,tykki2,tykkix2,tykkiy2) And KeyDown(29) Then 
+        If pommitus2=0 Or pommitus2=1 Then
+            t2=1'tehdään animaatio
+            If voima2<30 Then voima2#+1  // Tai oikeastaan lataus
+            pommitus2=0
+            tykkivalmiina2=1
+            Color cbdark
+            Box tykkix2,tykkiy2-15,32,10,0
+            Color cbgreen
+            Box tykkix2+1,tykkiy2-14,voima2#,8,1
+            If voima2>15 Then t2=2'animaatiota,(katapultti kallistuu, mitä enemmän voimaa)
+        EndIf
+    EndIf
+    
+    If ImagesOverlap(ukko2,x2,y2,tykki2,tykkix2,tykkiy2) And KeyDown(31) Then
+            If KeyDown(30) Then  tykkix2#-0.8:tykkiy2#-2
+            If KeyDown(32) Then tykkix2#+0.8:tykkiy2#-2
+    EndIf
+    
+    //Törmäys tykeille/katapulteille 2:
+    If ImagesCollide (maasto, maax, maay, 0, tykki2, tykkix2#, tykkiy2#,0) Then tykkix2#=vanhatykkix2#:tykkiy2#=vanhatykkiy2#
+    ////////////////////////////////////////////////////////////
+    
+    
+    //////ILMALAIVA://////////////////////////////////////////////////////////
+    
+    //Laivasta ulostukset:
+    If sisalla=1 And KeyHit(208) Then x1=laivax+28 : y1=laivay+18:pommitus=0:sisalla=0:buglog=1
+    If sisalla2=1 And KeyHit(31) Then x2=laivax2+28 : y2=laivay2+18:pommitus2=0:sisalla2=0:buglog2=1
+    
+    If buglog=1 Then buglog=0:Goto yli1'Bugaugsen esto. Purkkaa joo. 
+    
+    //Laivaan sisälle meno 1:
+    If ImagesOverlap(ukko1,x1,y1,laiva,laivax#,laivay#) And KeyHit(208) Then sisalla=1:pommitus=0
+    
+    //Jos ollaan sisällä laivassa, niin laivaa voi ohjata
+    If sisalla=1 Then 
+        hyppy1#=0:x1#=5000:y1#=-1000
+        //Bugiestoja taas:
+        If 3>pommitus>=1 Then pommitus=0
+        //Laivan ohjaus:
+        If KeyDown(203) Then laivax#-1:laivasuunta=-1
+        If KeyDown(205) Then laivax#+1:laivasuunta=1
+        If KeyDown(200) Then laivay#-2
+        //Pommin pudotus:
+        If KeyHit(52) And pommitus=0 Then 
+            If aselaiva=0 Then pommitus=3:px#=laivax#+32:py#=laivay#+50:plento#=0
+            If aselaiva=1 Then  Gosub LisääAmmus
+        EndIf
+        //Aseen vaihto
+        If KeyHit(28) Then 
+            aselaiva+1
+            If aselaiva>1 Then aselaiva=0
+        EndIf
+    EndIf
+    
+    If tuhoutunut=1 Then laivax=-500: laivay=-890
+    
+    '... ja ukko 2:
+    yli1:
+    If buglog2=1 Then buglog2=0:Goto ylimeen'Bugaugsen esto. Purkkaa joo. 
+    
+    //Laivaan sisällä meno 2:
+    If ImagesOverlap(ukko2,x2,y2,laiva2,laivax2#,laivay2#) And KeyHit(31) Then sisalla2=1:pommitus2=0
+    
+    //Jos ollaan sisällä laivassa, niin laivaa voi ohjata
+    If sisalla2=1 Then 
+        hyppy2#=0:x2#=-500:y2#=-1000
+        //Bugiestoja taas:
+        If 3>pommitus2>=1 Then pommitus2=0
+        //Laivanohjaus
+        If KeyDown(30) Then laivax2#-1:laivasuunta2=-1
+        If KeyDown(32) Then laivax2#+1:laivasuunta2=1
+        If KeyDown(17) Then laivay2#-2
+        //Pommin pudotus:
+        If KeyHit(29) And pommitus2=0 Then 
+            If aselaiva2=0 Then pommitus2=3:px2#=laivax2#+32:py2#=laivay2#+50:plento2#=0
+            If aselaiva2=1 Then Gosub Lisääammus2
+        EndIf
+        //Aseen vaihto
+        If KeyHit(16) Then 
+            aselaiva2+1
+            If aselaiva2>1 Then aselaiva2=0
+        EndIf
+    EndIf
+        
+    If tuhoutunut2=1 Then laivax2=-5000: laivay2=-890   
+        
+    ylimeen:
+    //Törmäys maahan, tänne ilmalaiva-systeemin loppuu, että toimii:
+    If ImagesCollide (maasto, maax, maay, 0, laiva, laivax#, laivay#,0) Then laivax#=vanhalaivax#:laivay#=vanhalaivay#
+    If ImagesCollide (maasto, maax, maay, 0, laiva2, laivax2#, laivay2#,0) Then laivax2#=vanhalaivax2#:laivay2#=vanhalaivay2#
+    
+    //ILMALAIVAN RAJAT:
+    If laivax>940 And tuhoutunut=0 Then laivax=940
+    If laivax<0 And tuhoutunut=0 Then laivax=0
+    If laivay>750 And tuhoutunut=0 Then Goto kuolema
+    If laivay<0 And tuhoutunut=0 Then laivay=0
+    If laivax2>940 And tuhoutunut2=0 Then laivax2=940
+    If laivax2<0 And tuhoutunut2=0 Then laivax2=0
+    If laivay2>750 And tuhoutunut2=0 Then Goto kuolema2
+    If laivay2<0 And tuhoutunut2=0 Then laivay2=0
+    
+    //Ilmalaivan ohjusten päivitys:
+    Gosub Päivitäammukset
+    Gosub Päivitäammukset2
+    
+    ///////////////////////////////////////////////////////////////////////////////
+    
+    
+    //Kuoleminen(ELI ELKKA LOPPUU tai RAJOJEN YLITTÄMINEN)
+    If y1#>750 Or elkka<0 Then
+        kuolema:
+        SetFont arial
+        Color cbdarkred
+        Text 250,300,"PELAAJA 2 VOITTI!"
+        DrawScreen
+        Wait 3000
+        StopSound musa
+        Goto valikko
+    EndIf
+    If y2#>750 Or elkka2<0 Then
+        kuolema2:
+        SetFont arial
+        Color cbdarkred
+        Text 250,300,"PELAAJA 1 VOITTI!"
+        DrawScreen
+        Wait 3000
+        StopSound musa
+        Goto valikko
+    EndIf
+    
+    //Ilmalaivan hajoaminen:
+    If laivay#>750 Or laivaelkka<0 Then 
+        If tuhoutunut=0
+            px2=laivax+20
+            py2=laivay+20
+            If sisalla=1 Then 
+                x1=laivax+28
+                y1=laivay+18
+            EndIf
+            Gosub räjähdys
+        EndIf
+        tuhoutunut=1
+        sisalla=0
+    EndIf
+    If laivay2#>750 Or laivaelkka2<0 Then 
+        If tuhoutunut2=0 Then
+            px=laivax2+20
+            py=laivay2+20
+            If sisalla2=1 Then 
+                x2=laivax2+28
+                y2=laivay2+18
+            EndIf
+            Gosub räjähdys2
+        EndIf
+        tuhoutunut2=1
+        sisalla2=0
+    EndIf
+        
+    
+    ////////////////////////////////////////////////////////////////
+    
+    //Lopetus://
+    If EscapeKey() Then StopSound musa: Goto valikko
+    
+    ////ELÄMÄT://///
+    //Pelaajan yksi elämä:
+    SetFont perus
+    Color cbdarkred
+    If aselaiva=0 Then aseesi$="POMMI"
+    If aselaiva=1 Then aseesi$="OHJUS"
+    Text 875,15,"PELAAJA 1"
+    Box 875,30,elkka,20
+    If elkka>0 Then Color cbblack: Box 875,30,100,20,OFF
+    Color cbdarkred
+    Text 875,60,"ILMALAIVA"
+    Text 875,75,"ASE: "+aseesi$
+    Box 875,90,laivaelkka,15
+    if laivaelkka>0 then Color cbblack: Box 875,90,100,15,OFF
+    
+    //Pelaajan kaksi elämä:
+    SetFont perus
+    Color cbgreen
+    If aselaiva2=0 Then aseesi2$="POMMI"
+    If aselaiva2=1 Then aseesi2$="OHJUS"
+    Text 25,15,"PELAAJA 2"
+    Box 25,30,elkka2,20 
+    If elkka2>0 Then Color cbblack:Box 25,30,100,20,OFF
+    Color cbgreen
+    Text 25,60,"ILMALAIVA"
+    Text 25,75,"ASE: "+aseesi2$
+    Box 25,90,laivaelkka2,15
+    If laivaelkka2>0 Then Color cbblack: Box 25,90,100,15,OFF
+    
+    //MUSIIKKI:
+    ///////////MUSIIKKI///////////
+    If pälli=0 Then
+    If SoundPlaying(musa)=0 Then //Jos musa loppuu niin uutta kehiin
+        musa = PlaySound ("pelijami.ogg")
+    EndIf
+    EndIf
+    
+    If KeyDown (50) Then StopSound musa: pälli=1'Musat pois
+    
+    ///////////////////////////////////////////////
+    //Piirrot, jotka pitää suorittaa lopussa:
+    DrawImage maasto,maax,maay//maasto piirretään
+    
+    DrawImage tykki,tykkix,tykkiy,t1//tykit ensin, että ukot tulee eteen
+    DrawImage tykki2,tykkix2,tykkiy2,t2//tykit ensin, että ukot tulee eteen
+    DrawImage laiva,laivax,laivay//laiva
+    DrawImage laiva2,laivax2,laivay2//laiva
+    
+    //POMMIN PIIRTO:
+    DrawImage pommi,px,py
+    DrawImage pommi2,px2,py2
+    //Ohjusten piirto:
+    For a=0 To 2
+        If OHJUS_ELOSSA(a)=ON Then 
+            DrawImage OHJUS(a,1),OHJUS_XY(a,1),OHJUS_XY(a,2)
+        EndIf
+    Next a
+      For a=0 To 2
+        If OHJUS_ELOSSA2(a)=ON Then 
+            DrawImage OHJUS2(a,1),OHJUS_XY2(a,1),OHJUS_XY2(a,2)
+        EndIf
+    Next a
+    'Räjähdykset:
+    DrawImage pum,rx#,ry#//räjähdys
+    DrawImage pum2,rx2#,ry2#//räjähdys
+    rx=1000
+    ry=1000
+    rx2=1000
+    ry2=1000
+    
+    //UKOT PIIRRETÄÄN KAIKEN PÄÄLLE:
+    DrawImage ukko1,x1,y1//Ensimmäinen ukko piirretään
+    DrawImage ukko2,x2,y2//Ensimmäinen ukko piirretään
+    
+    DrawScreen//piirretään näyttö
+Forever
+
+'-----------------------------------------------
+LisääAmmus:
+        
+    'ensin tarkastetaan, onko paikoja vapaana
+    For i=0 To 2
+        If OHJUS_ELOSSA(i)=OFF Then
+            'vapaa paikka löytyi, luodaan pati 
+            OHJUS_ELOSSA(i)=ON
+            OHJUS(i,1)=CloneImage(ohjuskuva)
+            OHJUS_XY(i,0) = laivasuunta*30
+            OHJUS_XY(i,1) = laivax+30+OHJUS_XY(i,0)
+            OHJUS_XY(i,2) = laivay+25
+            Exit
+        EndIf
+    Next i
+Return 'palaa takaisin pääsilmukkaan
+'-----------------------------------------------
+PäivitäAmmukset:
+
+    'käydään KAIKKI läpi
+    For i=0 To 2 
+        If OHJUS_ELOSSA(i)=ON Then
+            OHJUS_XY(i,1) = OHJUS_XY(i,1)+(OHJUS_XY(i,0)/10)
+             //Rajojen ylitys:
+            If OHJUS_XY(i,1) < 0 Or OHJUS_XY(i,1) > 1000 Then 
+                DeleteImage OHJUS(i,1)
+                OHJUS_ELOSSA(i)=OFF
+                OHJUS_XY(i,1)= 5000
+                Goto loppu
+            EndIf
+            //Ohjuksen osuman tarkistus, räjäytys ja tuhoaminen:
+            If ImagesCollide (maasto, maax, maay, 0, OHJUS(i,1), OHJUS_XY(i,1), OHJUS_XY(i,2),0) Then
+                DrawToImage maasto
+                Color cbblack
+                Circle OHJUS_XY(i,1)-20,OHJUS_XY(i,2)-20,40
+                DrawToScreen
+                lolx = OHJUS_XY(i,1)-20 : loly = OHJUS_XY(i,2)-20
+                DrawImage OHJUS(i,2),lolx,loly
+                    //Elkan menetys:
+                    If ImagesCollide (OHJUS(i,2),lolx,loly, 0, ukko2, x2, y2,0)=1 Then elkka2-10
+                    If ImagesCollide (OHJUS(i,2),lolx,loly, 0, laiva2, laivax2, laivay2,0)=1 Then laivaelkka2-15
+                DeleteImage OHJUS(i,1)
+                OHJUS_ELOSSA(i)=OFF
+                OHJUS_XY(i,1)= 5000
+                Goto loppu
+            EndIf
+            If ImagesOverlap( laiva2, laivax2, laivay2, OHJUS(i,1),OHJUS_XY(i,1),OHJUS_XY(i,2)) Then
+                DrawToImage maasto
+                Color cbblack
+                Circle OHJUS_XY(i,1)-20,OHJUS_XY(i,2)-20,40
+                DrawToScreen
+                lolx = OHJUS_XY(i,1)-20 : loly = OHJUS_XY(i,2)-20
+                DrawImage OHJUS(i,2),lolx,loly
+                    //Elkan menetys:
+                    If ImagesCollide (OHJUS(i,2),lolx,loly, 0, ukko2, x2, y2,0)=1 Then elkka2-10
+                    If ImagesCollide (OHJUS(i,2),lolx,loly, 0, laiva2, laivax2, laivay2,0)=1 Then laivaelkka2-15
+                DeleteImage OHJUS(i,1)
+                OHJUS_ELOSSA(i)=OFF
+                OHJUS_XY(i,1)= 5000
+                Goto loppu
+            EndIf
+            If ImagesCollide (ukko2, x2, y2,0,OHJUS(i,1),OHJUS_XY(i,1),OHJUS_XY(i,2), 0)=1 Then
+                DrawToImage maasto
+                Color cbblack
+                Circle OHJUS_XY(i,1)-20,OHJUS_XY(i,2)-20,40
+                DrawToScreen
+                lolx = OHJUS_XY(i,1)-20 : loly = OHJUS_XY(i,2)-20
+                DrawImage OHJUS(i,2),lolx,loly
+                    //Elkan menetys:
+                    If ImagesCollide (OHJUS(i,2),lolx,loly, 0, ukko2, x2, y2,0)=1 Then elkka2-10
+                    If ImagesCollide (OHJUS(i,2),lolx,loly, 0, laiva2, laivax2, laivay2,0)=1 Then laivaelkka2-15
+                DeleteImage OHJUS(i,1)
+                OHJUS_ELOSSA(i)=OFF
+                OHJUS_XY(i,1)= 5000
+                Goto loppu
+            EndIf
+          loppu:  
+        EndIf
+    Next i
+Return 'palaa takaisin pääsilmukkaan
+'----------------------------------------------------------------------------
+
+LisääAmmus2:
+        
+    'ensin tarkastetaan, onko paikoja vapaana
+    For i=0 To 2
+        If OHJUS_ELOSSA2(i)=OFF Then
+            'vapaa paikka löytyi, luodaan pati 
+            OHJUS_ELOSSA2(i)=ON
+            OHJUS2(i,1)=CloneImage(ohjuskuva)
+            OHJUS_XY2(i,0) = laivasuunta2*30
+            OHJUS_XY2(i,1) = laivax2+30+OHJUS_XY2(i,0)
+            OHJUS_XY2(i,2) = laivay2+25
+            Exit
+        EndIf
+    Next i
+Return 'palaa takaisin pääsilmukkaan
+'-----------------------------------------------
+PäivitäAmmukset2:
+
+    'käydään KAIKKI läpi
+    For i=0 To 2 
+        If OHJUS_ELOSSA2(i)=ON Then
+            OHJUS_XY2(i,1) = OHJUS_XY2(i,1)+(OHJUS_XY2(i,0)/10)
+             //Rajojen ylitys:
+            If OHJUS_XY2(i,1) < 0 Or OHJUS_XY2(i,1) > 1000 Then 
+                DeleteImage OHJUS2(i,1)
+                OHJUS_ELOSSA2(i)=OFF
+                OHJUS_XY2(i,1)= 5000
+                Goto loppujo
+            EndIf
+            //Ohjuksen osuman tarkistus, räjäytys ja tuhoaminen:
+            If ImagesCollide (maasto, maax, maay, 0, OHJUS2(i,1), OHJUS_XY2(i,1), OHJUS_XY2(i,2),0) Then
+                DrawToImage maasto
+                Color cbblack
+                Circle OHJUS_XY2(i,1)-20,OHJUS_XY2(i,2)-20,40
+                DrawToScreen
+                lolx2 = OHJUS_XY2(i,1)-20 : loly2 = OHJUS_XY2(i,2)-20
+                DrawImage OHJUS2(i,2),lolx2,loly2
+                    //Elkan menetys:
+                    If ImagesCollide (OHJUS2(i,2),lolx2,loly2, 0, ukko1, x1, y1,0)=1 Then elkka-10
+                    If ImagesCollide (OHJUS2(i,2),lolx2,loly2, 0, laiva, laivax, laivay,0)=1 Then laivaelkka-15
+                DeleteImage OHJUS2(i,1)
+                OHJUS_ELOSSA2(i)=OFF
+                OHJUS_XY2(i,1)= 5000
+                Goto loppujo
+            EndIf
+            If ImagesOverlap(laiva, laivax, laivay, OHJUS2(i,1),OHJUS_XY2(i,1),OHJUS_XY2(i,2)) Then
+                DrawToImage maasto
+                Color cbblack
+                Circle OHJUS_XY2(i,1)-20,OHJUS_XY2(i,2)-20,40
+                DrawToScreen
+                lolx2 = OHJUS_XY2(i,1)-20 : loly2 = OHJUS_XY2(i,2)-20
+                DrawImage OHJUS2(i,2),lolx2,loly2
+                    //Elkan menetys:
+                    If ImagesCollide (OHJUS2(i,2),lolx2,loly2, 0, ukko1, x1, y1,0)=1 Then elkka-10
+                    If ImagesCollide (OHJUS2(i,2),lolx2,loly2, 0, laiva, laivax, laivay,0)=1 Then laivaelkka-15
+                DeleteImage OHJUS2(i,1)
+                OHJUS_ELOSSA2(i)=OFF
+                OHJUS_XY2(i,1)= 5000
+                Goto loppujo
+            EndIf
+            If ImagesCollide (ukko1, x1, y1,0,OHJUS2(i,1),OHJUS_XY2(i,1),OHJUS_XY2(i,2), 0)=1 Then
+              DrawToImage maasto
+                Color cbblack
+                Circle OHJUS_XY2(i,1)-20,OHJUS_XY2(i,2)-20,40
+                DrawToScreen
+                lolx2 = OHJUS_XY2(i,1)-20 : loly2 = OHJUS_XY2(i,2)-20
+                DrawImage OHJUS2(i,2),lolx2,loly2
+                    //Elkan menetys:
+                    If ImagesCollide (OHJUS2(i,2),lolx2,loly2, 0, ukko1, x1, y1,0)=1 Then elkka-10
+                    If ImagesCollide (OHJUS2(i,2),lolx2,loly2, 0, laiva, laivax, laivay,0)=1 Then laivaelkka-15
+                DeleteImage OHJUS2(i,1)
+                OHJUS_ELOSSA2(i)=OFF
+                OHJUS_XY2(i,1)= 5000
+                Goto loppujo
+            EndIf
+          loppujo:
+        EndIf
+    Next i
+Return 'palaa takaisin pääsilmukkaan
+
+/////////////LOPPUTEKSTIT///////////////////////////////
+lopputekstit:
+StopSound menumusa
+Cls 
+ClsColor cbblack
+
+teksti#=600
+teksti2#=650
+teksti3#=750
+teksti4#=800
+teksti5#=900
+teksti6#=950
+teksti8#=1050
+
+loppumusa = PlaySound ("loppujami2.ogg")
+Repeat
+    
+    ShowMouse OFF
+
+    SetFont arial
+    Color cbyellow
+    Text 10,teksti#,"Koodaus, grafiikka, musiikki:"
+    Text 10,teksti2#,"Tuukka 'Tuxu' Jurvakainen"
+    
+    Text 10,teksti3#,"Testaus- ja ideointiapuna:"
+    Text 10,teksti4#,"Peluri, Aksu, Nachtis, Jomena"
+    
+    Text 10,teksti5#,"Loppumusiikki: "
+    Text 10,teksti6#,"Hippi"
+    
+    SetFont otsikko2
+    Text 10,teksti8#,"TUXUGAMES 2©09"
+    
+    teksti#=teksti#-1.2
+    teksti2#=teksti2#-1.2
+    teksti3#=teksti3#-1.2
+    teksti4#=teksti4#-1.2
+    teksti5#=teksti5#-1.2
+    teksti6#=teksti6#-1.2
+    teksti8#=teksti8#-1.2
+    
+    If SoundPlaying(loppumusa)=0 Then Exit
+    If EscapeKey() Then Exit
+    
+    DrawScreen
+Forever
+
