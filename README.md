@@ -1,6 +1,7 @@
 # urpojentaisto
 ---URPOJEN TAISTO 1.0.0---
-(c) TuxuGames 2010 
+(c) Tuukka Jurvakainen / TuxuGames 2010 
+
 
 Sisältö:
 1. YLEISTÄ
@@ -44,13 +45,12 @@ erilaisia taisteluajoneuvoja (katapultti, ilmalaiva).
 Urpo-pelissä ei ole tietokonevastusta. 
 
 Molempiin pelityyppeihin on mahdollista tehdä omia kenttiä.
-Lue lisää kohdasta 3. OHJEET OMAN KENTÄN TEKOON.
------------------------------------
+Lue lisää kohdasta kolme "OHJEET OMAN KENTÄN TEKOON"
   
 
 
 
-2. NÄPPÄIMET
+2.NÄPPÄIMET
 ----------------------
 Yleiset näppäimet:
 
@@ -120,7 +120,7 @@ päästä näppäin pohjasta.
 
 
 
-3. OHJEET OMAN KENTÄN TEKOON
+3.OHJEET OMAN KENTÄN TEKOON
 --------------------------------------
 
 Urpojen Taistoon on mahdollista tehdä omia kenttiä.
@@ -185,7 +185,7 @@ kentistä.
 ------------------------------------------------------------------
 
 
-4. MUUTA
+4.MUUTA
 ----------------------------------------
 
 Pelin lähdekoodin voit ladata TuxuGamesin kotisivuilta:
